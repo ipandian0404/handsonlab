@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Momentum Financial Dreams Copilot Race</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme = param || "dark";
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--cp-text);
+      background: var(--cp-bg-elevated);
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.55;
+    }
+    button { font: inherit; cursor: pointer; }
+    code, pre { font-family: Consolas, "Courier New", Courier, monospace; }
+    .topbar {
+      padding: 22px clamp(20px, 6vw, 86px) 30px;
+      background: var(--cp-surface);
+      border-bottom: 1px solid var(--cp-border);
+    }
+    .brand { display: flex; justify-content: space-between; gap: 20px; align-items: center; }
+    .brand strong { color: var(--cp-accent); font-size: 1.1rem; }
+    .brand span { color: var(--cp-text-muted); font-size: 0.82rem; }
+    .track {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      align-items: start;
+      max-width: 920px;
+      margin: 28px auto 0;
+    }
+    .track::before {
+      content: "";
+      position: absolute;
+      top: 20px;
+      left: 8%;
+      right: 8%;
+      height: 3px;
+      background: var(--cp-border-strong);
+    }
+    .stop {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      justify-items: center;
+      gap: 7px;
+      padding: 0 4px;
+      color: var(--cp-text-muted);
+      background: transparent;
+      border: 0;
+      text-align: center;
+    }
+    .stop-icon {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      background: var(--cp-surface-soft);
+      border: 2px solid var(--cp-border-strong);
+      border-radius: 50%;
+      font-size: 1.1rem;
+    }
+    .stop.active { color: var(--cp-text); }
+    .stop.active .stop-icon { border-color: var(--cp-accent); box-shadow: 0 0 0 5px var(--cp-accent-soft); }
+    .stop.done .stop-icon { color: var(--cp-accent-fg); background: var(--cp-success); border-color: var(--cp-success); }
+    .stop small { font-size: 0.7rem; font-weight: 700; }
+    main { width: min(940px, calc(100% - 32px)); margin: 42px auto 72px; }
+    .race-card {
+      overflow: hidden;
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+      box-shadow: var(--cp-shadow);
+    }
+    .card-head { padding: 32px clamp(22px, 5vw, 52px); border-bottom: 1px solid var(--cp-border); }
+    .status { margin: 0 0 7px; color: var(--cp-warning); font-size: 0.76rem; font-weight: 900; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 3.1rem); letter-spacing: 0; line-height: 1.08; }
+    .intro { max-width: 720px; margin: 14px 0 0; color: var(--cp-text-soft); font-size: 1.04rem; }
+    .card-body { padding: 30px clamp(22px, 5vw, 52px) 40px; }
+    h2 { margin: 30px 0 10px; color: var(--cp-accent); font-size: 1.03rem; }
+    h2:first-child { margin-top: 0; }
+    ol, ul { padding-left: 22px; }
+    li + li { margin-top: 7px; }
+    .enterprise { padding: 18px; background: var(--cp-accent-soft); border-left: 4px solid var(--cp-accent); border-radius: 0 6px 6px 0; }
+    .prompt {
+      margin: 14px 0;
+      padding: 18px;
+      background: var(--cp-bg-elevated);
+      border: 1px solid var(--cp-border);
+      border-radius: 7px;
+    }
+    .prompt pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--cp-text-soft); }
+    .copy {
+      margin-top: 12px;
+      padding: 0;
+      color: var(--cp-link);
+      background: transparent;
+      border: 0;
+      font-weight: 700;
+    }
+    .note { color: var(--cp-warning); }
+    .controls { display: flex; justify-content: space-between; gap: 12px; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--cp-border); }
+    .nav-button { min-height: 44px; padding: 10px 18px; color: var(--cp-text); background: var(--cp-surface-soft); border: 1px solid var(--cp-border-strong); border-radius: 7px; font-weight: 800; }
+    .nav-button.primary { color: var(--cp-accent-fg); background: var(--cp-accent); border-color: var(--cp-accent); }
+    .nav-button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: var(--cp-overlay);
+    }
+    .modal-backdrop[hidden] { display: none; }
+    .finish-modal {
+      width: min(625px, 100%);
+      padding: clamp(28px, 7vw, 58px);
+      text-align: center;
+      background: var(--cp-bg-elevated);
+      border: 2px solid var(--cp-success);
+      border-radius: 24px;
+      box-shadow: var(--cp-shadow);
+    }
+    .finish-modal h2 { margin: 0; color: var(--cp-success); font-size: clamp(1.8rem, 6vw, 2.6rem); }
+    .celebrate { margin: 26px 0; font-size: 2.5rem; }
+    .finish-modal p { color: var(--cp-text-soft); font-size: 1.1rem; }
+    .finish-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 28px 0 42px; }
+    .finish-item { padding: 12px; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 8px; }
+    @media (max-width: 640px) {
+      .brand { align-items: flex-start; flex-direction: column; }
+      .track { grid-template-columns: repeat(6, minmax(42px, 1fr)); overflow-x: auto; }
+      .stop small { display: none; }
+      main { margin-top: 24px; }
+      .controls { flex-direction: column; }
+      .nav-button { width: 100%; }
+      .finish-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><strong>Momentum Financial Dreams</strong><span>GitHub Copilot Enterprise Challenge Race</span></div>
+    <nav class="track" id="track" aria-label="Challenge race"></nav>
+  </header>
+  <main>
+    <article class="race-card" aria-live="polite">
+      <header class="card-head">
+        <p class="status" id="status"></p>
+        <h1 id="title"></h1>
+        <p class="intro" id="intro"></p>
+      </header>
+      <div class="card-body" id="body"></div>
+    </article>
+  </main>
+  <div class="modal-backdrop" id="finish" hidden>
+    <section class="finish-modal" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
+      <h2 id="finishTitle">🏆 RACE COMPLETE!</h2>
+      <div class="celebrate" aria-hidden="true">🎉 &nbsp; 🏎️ &nbsp; 🏁</div>
+      <p>You've mastered all 4 enterprise challenges with GitHub Copilot!</p>
+      <div class="finish-grid">
+        <div class="finish-item">📄 Documentation</div>
+        <div class="finish-item">⚙️ Custom Instructions</div>
+        <div class="finish-item">🤖 Spec-Driven Development Agent</div>
+        <div class="finish-item">🧪 Testing</div>
+      </div>
+      <button class="nav-button primary" id="raceAgain" type="button">🔄 Race Again</button>
+    </section>
+  </div>
+  <script>
+    const prompt = text => `<div class="prompt"><pre>${text}</pre><button class="copy" type="button" data-copy>📋 Click to copy</button></div>`;
+    const stages = [
+      {
+        icon: "🛞", label: "Pit Stop", status: "Overview", title: "🏁 Pit Stop — Getting Started",
+        intro: "Race through 4 enterprise challenges using GitHub Copilot to transform a fictional claims service into production-ready software.",
+        body: `<h2>🎯 What Is This Challenge?</h2><p>Your mission is to improve <strong>DreamGuard Claims</strong> through documentation, custom instructions, a spec-driven agent, and testing.</p><h2>🧰 Pre-requisites</h2><ul><li>Git and Python 3.10+</li><li>Visual Studio Code</li><li>GitHub Copilot and Copilot Chat</li><li>Edge or Chrome</li></ul><h2>⚙️ Set Up</h2><ol><li>Open this repository in VS Code.</li><li>Verify Copilot is signed in.</li><li>Open Chat with <code>Ctrl+Shift+I</code>.</li><li>Create a branch with your initials and surname.</li><li>Run the baseline tests and scorecard.</li></ol>${prompt("Help me create a branch named with my initials and surname, run the DreamGuard unit tests, and start a local server for the challenge guide.")}<h2>▶️ Optional: Build and Run</h2><ol><li>Create and activate a Python virtual environment.</li><li>Install the package with <code>python -m pip install -e .</code></li><li>Compile with <code>python -m compileall -q src scripts tests</code>.</li><li>Run the tests and scorecard.</li><li>In a separate terminal, run <code>python -m http.server 8000</code>.</li><li>Open <code>http://localhost:8000/challenge/</code>.</li></ol><p>The frontend is static, so no npm install or compilation is required. Stop the server with <code>Ctrl+C</code>.</p>${prompt("Create a Python virtual environment, install this project in editable mode, compile and test it, then start the static challenge frontend on port 8000.")}<h2>✅ Success Criteria</h2><ul><li>The project opens without errors.</li><li>Copilot Chat responds.</li><li>Two baseline tests pass.</li><li>The scorecard reports 5/100.</li><li>The frontend loads at <code>http://localhost:8000/challenge/</code>.</li></ul>`
+      },
+      {
+        icon: "📄", label: "Documentation", status: "Start", title: "Documentation",
+        intro: "Great software starts with great documentation. Make the claims code accessible to any team member.",
+        body: `<h2>🎯 Your Mission</h2><p>Generate a service guide, public API docstrings, and comments that explain the why behind complex decisions.</p><h2>🏢 Enterprise Value</h2><p class="enterprise">Documentation reduces onboarding time, enables knowledge transfer, and keeps financial-services software maintainable and reviewable.</p><h2>📝 Steps to Complete</h2><ol><li>Stay on your race branch.</li><li>Complete <code>docs/SERVICE.md</code>.</li><li>Add docstrings in <code>src/dreamguard/claims.py</code>.</li><li>Add selective comments for non-obvious reasoning.</li><li>Commit and push.</li></ol><h2>💡 Sample Prompt</h2>${prompt("Review #file:src/dreamguard/claims.py and #file:docs/SERVICE.md. Complete the service documentation and add useful public API docstrings. Explain only behavior supported by the code and state that every record is synthetic.")}<p class="note">💡 These are sample prompts. Improve them for your sprint.</p><h2>✅ Success Criteria</h2><ul><li>The service guide explains setup, architecture, rules, and structure.</li><li>Public APIs have useful docstrings.</li><li>Comments explain intent.</li><li>A new developer can test the service using only the docs.</li></ul>`
+      },
+      {
+        icon: "⚙️", label: "Instructions", status: "Pit Stop", title: "Custom Instructions",
+        intro: "Tailor GitHub Copilot to your team's coding, architecture, testing, and privacy standards.",
+        body: `<h2>🎯 Your Mission</h2><p>Create <code>.github/copilot-instructions.md</code> with repository-wide team conventions.</p><h2>🏢 Enterprise Value</h2><p class="enterprise">Custom instructions improve consistency across teams, reduce review cycles, and preserve architecture and privacy expectations.</p><h2>📝 Steps to Complete</h2><ol><li>Stay on your race branch.</li><li>Create <code>.github/copilot-instructions.md</code>.</li><li>Describe the Python claims architecture.</li><li>Define PEP 8, type hints, Decimal, unittest, synthetic-data, and public API rules.</li><li>Test the instructions in a fresh chat.</li><li>Commit and push.</li></ol><h2>💡 Sample Prompt</h2>${prompt("Create .github/copilot-instructions.md for DreamGuard. Include project context and require PEP 8 naming, type hints, Decimal for money, unittest with descriptive names, synthetic data only, focused changes, and public API preservation.")}<p class="note">💡 These are sample prompts. Improve them for your sprint.</p><h2>✅ Success Criteria</h2><ul><li>The repository instruction file exists.</li><li>Naming, style, architecture, testing, and privacy are covered.</li><li>Generated code follows the standards in a fresh chat.</li></ul>`
+      },
+      {
+        icon: "🤖", label: "SDD Agent", status: "Turbo", title: "Custom Agent — Spec-Driven Development",
+        intro: "Build a selectable Copilot agent that produces approved specifications before any code is written.",
+        body: `<h2>🎯 Your Mission</h2><p>Create <code>.github/agents/spec-driven-dev.agent.md</code> with three phases: Intent, Design, and Tasks + Executive Summary.</p><h2>🏢 Enterprise Value</h2><p class="enterprise">Spec-driven development aligns stakeholders and engineers early, reducing rework, scope creep, and ambiguity.</p><h2>📝 Steps to Complete</h2><ol><li>Create the custom agent file.</li><li>Define Phase 1 — Intent.</li><li>Define Phase 2 — Design.</li><li>Define Phase 3 — Tasks + Executive Summary.</li><li>Require approval after each phase.</li><li>Select and test the agent.</li><li>Ask the main agent to invoke it as a subagent for a focused spec review.</li><li>Save four documents under <code>specs/claims-status-notifications/</code>.</li><li>Commit and push.</li></ol><h2>💡 Create-Agent Prompt</h2>${prompt("Create .github/agents/spec-driven-dev.agent.md. It must run three sequential phases and ask for approval after each: Intent, Design, and Tasks + Executive Summary. Save intent.md, design.md, tasks.md, and summary.md under specs/[feature-name]/.")}<h2>🧪 Test Prompt</h2>${prompt("I want to add claims-status notifications that use synthetic contact details and inform a client when a claim becomes pending, referred, approved, or rejected.")}<h2>🤖 Subagent Prompt</h2>${prompt("Delegate a review of the claims-status notification specifications to the spec-driven-dev agent as a subagent. Report traceability gaps without changing files.")}<h2>✅ Success Criteria</h2><ul><li>The agent has all three gated phases.</li><li>All four spec documents exist.</li><li>Documents are coherent and traceable.</li><li>The agent completes a focused delegated review as a subagent.</li><li>The agent works for other feature requests.</li></ul>`
+      },
+      {
+        icon: "🧪", label: "Testing", status: "Finish Line", title: "Testing",
+        intro: "Build a rigorous test suite that validates claims logic and catches regressions before production.",
+        body: `<h2>🎯 Your Mission</h2><p>Generate tests covering happy paths, edge cases, boundaries, and invalid inputs.</p><h2>🏢 Enterprise Value</h2><p class="enterprise">Automated tests enable confident change, reduce incidents, support continuous delivery, and protect customer trust.</p><h2>📝 Steps to Complete</h2><ol><li>Stay on your race branch.</li><li>Test approval, pending-document, and referral decisions.</li><li>Add boundary and invalid-input tests.</li><li>Make only the required production changes.</li><li>Run tests and the scorecard.</li><li>Commit and push.</li></ol><h2>💡 Sample Prompts</h2>${prompt("Write unittest tests for #file:src/dreamguard/claims.py covering approval, missing documents, waiting-period referral, and the three-month boundary.")}${prompt("Add edge-case tests for unsupported claim types and zero or negative amounts, then make only the production changes required for those tests to pass.")}<h2>✅ Success Criteria</h2><ul><li>At least six well-named tests cover happy paths and edges.</li><li>Unsupported types and non-positive amounts cannot be approved.</li><li>All tests pass.</li><li>The scorecard reports 100/100.</li></ul>`
+      },
+      { icon: "🏁", label: "Finish", status: "Complete", title: "Finish Line", intro: "Review your work and complete the race.", body: "" }
+    ];
+    let active = Number(localStorage.getItem("momentum-race-stage") || 0);
+    const completed = new Set(JSON.parse(localStorage.getItem("momentum-race-complete") || "[]"));
+    const track = document.querySelector("#track");
+    const finish = document.querySelector("#finish");
+
+    function save() {
+      localStorage.setItem("momentum-race-stage", String(active));
+      localStorage.setItem("momentum-race-complete", JSON.stringify([...completed]));
+    }
+    function render() {
+      if (active === stages.length - 1) {
+        finish.hidden = false;
+        document.querySelector("#raceAgain").focus();
+        return;
+      }
+      finish.hidden = true;
+      const stage = stages[active];
+      document.querySelector("#status").textContent = stage.status;
+      document.querySelector("#title").textContent = stage.title;
+      document.querySelector("#intro").textContent = stage.intro;
+      document.querySelector("#body").innerHTML = `${stage.body}<div class="controls"><button class="nav-button" id="previous" type="button" ${active === 0 ? "disabled" : ""}>⬅️ Previous</button><button class="nav-button primary" id="next" type="button">${active === stages.length - 2 ? "Complete Race 🏁" : "Next Challenge ➡️"}</button></div>`;
+      document.querySelector("#previous").addEventListener("click", () => { active -= 1; save(); render(); });
+      document.querySelector("#next").addEventListener("click", () => { completed.add(active); active += 1; save(); render(); window.scrollTo(0, 0); });
+      document.querySelectorAll("[data-copy]").forEach(button => button.addEventListener("click", async () => {
+        const text = button.previousElementSibling.textContent;
+        await navigator.clipboard.writeText(text);
+        button.textContent = "✅ Copied";
+      }));
+      track.replaceChildren(...stages.map((item, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `stop${index === active ? " active" : ""}${completed.has(index) ? " done" : ""}`;
+        button.innerHTML = `<span class="stop-icon">${completed.has(index) ? "✓" : item.icon}</span><small>${item.label}</small>`;
+        button.addEventListener("click", () => { active = index; save(); render(); window.scrollTo(0, 0); });
+        return button;
+      }));
+    }
+    document.querySelector("#raceAgain").addEventListener("click", () => {
+      completed.clear(); active = 0; save(); render();
+    });
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+[
+  {
+    "policy_number": "SYN-1001",
+    "claim_type": "life",
+    "amount": "250000.00",
+    "months_active": 24,
+    "documents": ["death_certificate", "identity_document"]
+  },
+  {
+    "policy_number": "SYN-1002",
+    "claim_type": "disability",
+    "amount": "80000.00",
+    "months_active": 18,
+    "documents": ["identity_document"]
+  },
+  {
+    "policy_number": "SYN-1003",
+    "claim_type": "life",
+    "amount": "120000.00",
+    "months_active": 1,
+    "documents": ["death_certificate", "identity_document"]
+  }
+]
