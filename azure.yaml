@@ -1,0 +1,11 @@
+name: momentum-copilot-race
+metadata:
+  template: momentum-copilot-race@0.0.1
+infra:
+  provider: bicep
+  path: infra
+services:
+  web:
+    project: .
+    language: py
+    host: appservice

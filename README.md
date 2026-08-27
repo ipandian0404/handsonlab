@@ -68,6 +68,23 @@ Open <http://localhost:8000/challenge/>. The frontend uses static HTML, CSS, and
 JavaScript, so no npm installation or compilation is required. Stop the server
 with `Ctrl+C`.
 
+## Deploy to Azure App Service
+
+The repository includes an `azd` configuration and Bicep infrastructure for a
+Linux Azure Web App. After signing in to Azure Developer CLI, deploy with:
+
+```powershell
+azd auth login
+azd env new momentum-race
+azd env set AZURE_LOCATION southafricanorth
+azd provision --preview
+azd up
+```
+
+The deployment creates a B1 App Service plan, Web App, Application Insights,
+and Log Analytics workspace. Set a different `AZURE_LOCATION` or select another
+allowed `appServicePlanSku` in [infra/main.bicep](infra/main.bicep) when needed.
+
 ## Project map
 
 ```text
