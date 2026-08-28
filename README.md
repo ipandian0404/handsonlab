@@ -80,6 +80,9 @@ into chat or commit credentials. GitLab currently marks this feature as Beta and
 an administrator must enable the required GitLab Duo, beta-feature, and MCP
 access settings.
 
+When VS Code asks for the server ID, type `GitLab`. This is a local display name
+you choose, not an identifier that must be copied from GitLab.
+
 See [the GitLab MCP challenge](CHALLENGES.md#6-gitlab-mcp)
 and the [official GitLab MCP server documentation](https://docs.gitlab.com/user/model_context_protocol/mcp_server/).
 

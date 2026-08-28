@@ -252,27 +252,52 @@ to the signed-in user.
 MCP gives AI assistants governed access to development context without copying
 project data or credentials into prompts.
 
-### Prerequisites
+### Before You Start
 
-Your GitLab administrator must enable GitLab Duo availability, beta and
-experimental features, and MCP server access for your group or instance.
+- Use a GitLab account that can open at least one project.
+- Ask your GitLab administrator to confirm that GitLab Duo, beta and
+  experimental features, and MCP server access are enabled.
+- You do **not** need to create an access token.
 
-### Steps to Complete
+### Click-by-Click Setup
 
-1. Open the VS Code Command Palette with `Ctrl+Shift+P`.
-2. Run `MCP: Add Server` and select `HTTP`.
-3. Enter `https://gitlab.com/api/v4/mcp`. For GitLab Self-Managed or Dedicated,
-   replace `gitlab.com` with your GitLab instance host.
-4. Enter `GitLab` as the server ID.
-5. Save the configuration globally or in the workspace.
-6. Review and approve the OAuth authorization request in your browser. Do not
-   create, paste, or commit an access token.
-7. Run `MCP: List Servers` and confirm that GitLab is connected.
-8. Open a new Copilot chat and try this read-only verification prompt:
+1. In VS Code, press `Ctrl+Shift+P`. The **Command Palette** opens at the top.
+2. Type `MCP: Add Server`, then select that exact command.
+3. When VS Code asks for the server type, select
+   **HTTP (HTTP or Server-Sent Events)**.
+4. When VS Code asks for the server URL, paste
+   `https://gitlab.com/api/v4/mcp`, then press `Enter`. For GitLab Self-Managed
+   or Dedicated, replace only `gitlab.com` with your GitLab instance host.
+5. When VS Code asks for a **Server ID**, type `GitLab`, then press `Enter`.
+   **You do not obtain this value from GitLab.** It is simply the local display
+   name you choose for this connection.
+6. When VS Code asks where to save it, select **Workspace** for this lab. Select
+   **Global** only if you want the connection in every project.
+7. If VS Code asks whether to start the server, select **Start**.
+8. Your browser opens GitLab OAuth. Confirm the GitLab address, sign in if
+   required, review the access request, and select **Authorize**. Never paste a
+   token into VS Code Chat.
+9. Return to VS Code, press `Ctrl+Shift+P`, run `MCP: List Servers`, and select
+   `GitLab`. Its status should be **Running**.
+10. Open a new Copilot Chat, switch to **Agent** mode, select the tools button,
+    and confirm that GitLab tools are listed.
+11. Paste this read-only verification prompt and review the proposed tool call
+    before approving it:
 
 ```text
 Using GitLab MCP, list my accessible projects. Do not create or modify anything.
 ```
+
+### If It Does Not Connect
+
+- **No browser opened:** Run `MCP: List Servers`, select `GitLab`, and choose
+   **Start** or **Restart**.
+- **Access denied or no tools:** Ask your GitLab administrator to verify the
+   prerequisites above.
+- **Wrong GitLab account:** Sign out of GitLab in the browser, restart the
+   server, and repeat OAuth.
+- **Wrong URL:** Remove the server and add it again. GitLab.com must use
+   `https://gitlab.com/api/v4/mcp`.
 
 Review every requested tool action before approval. MCP tools can encounter
 untrusted instructions in issues, merge requests, and repository content, so use
@@ -282,7 +307,8 @@ for current availability and configuration details.
 
 ### Success Criteria
 
-- GitLab appears as connected in `MCP: List Servers`.
+- `GitLab` shows **Running** in `MCP: List Servers`.
+- GitLab tools appear in Copilot Chat Agent mode.
 - Authentication uses browser OAuth and no token is stored in the repository.
 - The read-only verification prompt returns only accessible projects.
 - Every MCP tool action is reviewed before approval.
