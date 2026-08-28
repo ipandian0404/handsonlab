@@ -1,33 +1,137 @@
-# DreamGuard Claims Service Guide
+# DreamGuard Claims Service
 
-## Overview
+## Purpose
 
-DreamGuard Claims is a lightweight training service for evaluating synthetic claim records. It does not perform customer-facing claims processing and it does not call external systems or services.
+DreamGuard Claims is a lightweight Python training service that converts synthetic claim records into deterministic assessment results. It is designed for learning, testing, and documentation exercises rather than production claims adjudication. The service does not communicate with customers or external systems.
 
-The public package surface is defined in `src/dreamguard/__init__.py` and exposes:
+> All records, claim details, policy numbers, amounts, and document names in this repository are synthetic. Do not add or use real customer, identity, health, policy, contact, or financial data.
+
+## System architecture
+
+The service is intentionally small and composed of a few clear layers.
+
+### 1. Package entry point
+
+File: `src/dreamguard/__init__.py`
+
+This module re-exports the public API:
 
 - `Claim`
 - `ClaimDecision`
 - `assess_claim`
 - `load_claims`
 
-This service is intentionally narrow: it reads claim records, converts them into domain objects, evaluates a short decision flow, and returns a status result.
+This allows callers to import the service directly with:
 
-## Synthetic data notice
+```python
+from dreamguard import Claim, ClaimDecision, assess_claim, load_claims
+```
 
-All records, claim details, policy values, documents, and amounts in this repository are synthetic. Do not add or use real customer, identity, health, policy, contact, or financial information in sample data or exercises.
+### 2. Domain models
+
+File: `src/dreamguard/claims.py`
+
+The core types are frozen dataclasses:
+
+- `Claim`: input record for a single claim
+- `ClaimDecision`: output record returned by evaluation
+
+`Claim` holds:
+
+- `policy_number: str`
+- `claim_type: str`
+- `amount: Decimal`
+- `months_active: int`
+- `documents: tuple[str, ...]`
+
+`ClaimDecision` holds:
+
+- `status: str`
+- `approved_amount: Decimal`
+- `reasons: tuple[str, ...]`
+
+These models are immutable and are passed between the intake and assessment layers.
+
+### 3. Assessment logic
+
+File: `src/dreamguard/claims.py`
+
+The function `assess_claim(claim: Claim) -> ClaimDecision` evaluates a single claim and returns a `ClaimDecision` without mutating the input object.
+
+The decision flow is:
+
+1. If `months_active < 3`, return `referred` with amount `0` and the reason `Waiting period review required`.
+2. Otherwise, compare the required document set for the claim type with the document tuple already attached to the claim.
+3. If one or more required documents are missing, return `pending_documents` with amount `0` and one `Missing <document>` reason per missing item.
+4. If the waiting-period rule does not trigger and no required documents are missing, return `approved` with the original claim amount and no reasons.
+
+### 4. JSON intake boundary
+
+File: `src/dreamguard/intake.py`
+
+The function `load_claims(path: str | Path) -> list[Claim]` reads a JSON file, expects a top-level array of records, converts each `amount` field to `Decimal`, converts each `documents` list to a tuple, and returns a list of `Claim` objects.
+
+This is the repository’s input boundary for loading claim data from disk.
+
+### 5. Web service entry point
+
+File: `app.py`
+
+The app exposes a tiny HTTP service that serves static challenge files and a simple `/api/assess` endpoint. The endpoint accepts a JSON claim payload, converts it into a `Claim`, calls `assess_claim`, and returns a JSON response with:
+
+- `status`
+- `approved_amount`
+- `reasons`
+
+This service is used for the browser-based demo and challenge flow.
+
+## Repository structure
+
+```text
+.
+├── app.py                         # Simple HTTP app and API endpoint
+├── azure.yaml                    # Azure deployment config
+├── CHALLENGES.md                 # Detailed challenge instructions
+├── README.md                     # Lab overview and quick-start instructions
+├── pyproject.toml                # Python package metadata
+├── data/
+│   └── sample_claims.json        # Synthetic sample claim records
+├── demo/
+│   └── index.html                # Demo UI for claim assessment
+├── challenge/
+│   └── index.html                # Challenge experience and guide
+├── docs/
+│   └── SERVICE.md                # Service documentation
+├── infra/
+│   └── main.bicep                # Azure infrastructure definition
+├── scripts/
+│   └── score.py                  # Scorecard utility
+├── specs/
+│   └── claims-status-notifications/
+├── src/
+│   └── dreamguard/
+│       ├── __init__.py           # Public package exports
+│       ├── claims.py             # Domain models + assessment rules
+│       └── intake.py             # JSON loading for claim records
+├── tests/
+│   ├── test_app.py               # API and payload validation tests
+│   └── test_claims.py            # Claim logic and intake tests
+└── .venv/                        # Optional local virtual environment
+```
 
 ## Setup and running instructions
 
-From the repository root, create and activate a Python environment if needed, then run the project commands below.
+The following steps are enough for a new developer to set up the project and run the service locally using only this file.
 
-### 1. Change to the repository root
+### 1. Open the repository root
 
 ```powershell
 cd /path/to/handsonlab
 ```
 
-### 2. Create and activate a virtual environment (optional but recommended)
+### 2. Create a virtual environment
+
+On Windows PowerShell:
 
 ```powershell
 python -m venv .venv
@@ -41,23 +145,20 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Install project dependencies
+### 3. Install the package in editable mode
 
 ```powershell
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -e .
 ```
 
-If this repository uses the project metadata in `pyproject.toml`, the package can also be installed in editable mode:
-
-```powershell
-pip install -e .
-```
-
-### 4. Run the unit tests
+### 4. Run the test suite
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
+
+This executes the repository’s unit tests and validates the core assessment flow and sample claim loading.
 
 ### 5. Run the scorecard
 
@@ -65,9 +166,46 @@ python -m unittest discover -s tests -v
 python scripts/score.py
 ```
 
-### 6. Load sample claims manually
+This reports challenge progress and current status across the lab stages.
 
-The JSON intake path is implemented in `src/dreamguard/intake.py`. The repository includes a sample file at `data/sample_claims.json`.
+### 6. Start the local service
+
+```powershell
+python app.py
+```
+
+The app starts a local web server. The challenge UI is served at:
+
+- http://localhost:8000/challenge/
+- http://localhost:8000/demo/
+
+### 7. Validate the API directly
+
+A `POST` to `/api/assess` accepts a JSON payload shaped like a claim object and returns a decision payload.
+
+Example payload:
+
+```json
+{
+  "policy_number": "SYN-1001",
+  "claim_type": "life",
+  "amount": "250000.00",
+  "months_active": 24,
+  "documents": ["death_certificate", "identity_document"]
+}
+```
+
+Example response:
+
+```json
+{
+  "status": "approved",
+  "approved_amount": "250000.00",
+  "reasons": []
+}
+```
+
+### 8. Load claims from the sample file
 
 ```python
 from pathlib import Path
@@ -77,17 +215,17 @@ claims = load_claims(Path("data/sample_claims.json"))
 print(claims)
 ```
 
-### 7. Evaluate a single claim
+### 9. Evaluate a single claim directly
 
 ```python
 from decimal import Decimal
 from dreamguard import Claim, assess_claim
 
 claim = Claim(
-    policy_number="POL-1001",
+    policy_number="SYN-1001",
     claim_type="life",
-    amount=Decimal("2500.00"),
-    months_active=12,
+    amount=Decimal("250000.00"),
+    months_active=24,
     documents=("death_certificate", "identity_document"),
 )
 
@@ -95,171 +233,57 @@ result = assess_claim(claim)
 print(result)
 ```
 
-## Architecture overview
+## Business rules implemented in code
 
-The service has a simple, layered structure:
-
-### 1. Data intake layer
-
-File: `src/dreamguard/intake.py`
-
-`load_claims(path)`:
-
-- opens a JSON file using `Path(path)`
-- reads a top-level JSON array
-- iterates through each record
-- converts `amount` to `Decimal`
-- converts `documents` to a tuple
-- builds a `Claim` object for each record
-
-This function is the JSON boundary for the service. It does not validate schema beyond the expected dictionary keys being present when accessed.
-
-### 2. Domain model layer
-
-File: `src/dreamguard/claims.py`
-
-`Claim` is a frozen dataclass representing a single claim input record:
-
-- `policy_number: str`
-- `claim_type: str`
-- `amount: Decimal`
-- `months_active: int`
-- `documents: tuple[str, ...]`
-
-`ClaimDecision` is a frozen dataclass representing the service result:
-
-- `status: str`
-- `approved_amount: Decimal`
-- `reasons: tuple[str, ...]`
-
-These models are immutable and are passed between the intake and assessment layers.
-
-### 3. Decision logic layer
-
-File: `src/dreamguard/claims.py`
-
-`assess_claim(claim: Claim) -> ClaimDecision` applies the implemented decision rules to one claim. It does not mutate the input `Claim` and returns a new `ClaimDecision` object.
-
-The decision flow works like this:
-
-1. Evaluate the waiting-period rule.
-2. If the claim has passed the waiting period, check the required documents for the claim type.
-3. If any required documents are missing, return `pending_documents`.
-4. Otherwise, return `approved`.
-
-### 4. Package API layer
-
-File: `src/dreamguard/__init__.py`
-
-This module re-exports the package's public API so callers can use:
-
-```python
-from dreamguard import Claim, ClaimDecision, assess_claim, load_claims
-```
-
-## Business and claims rules enforced by the code
-
-The current implementation enforces only the checks that are explicitly coded in `assess_claim`.
+The current implementation enforces a small set of rules that are explicitly coded in `assess_claim`.
 
 ### Rule 1: waiting period review
 
 If `claim.months_active < 3`, the service returns:
 
-- status: `referred`
-- approved amount: `Decimal("0")`
-- reasons: `("Waiting period review required",)`
+- `status`: `referred`
+- `approved_amount`: `Decimal("0")`
+- `reasons`: `("Waiting period review required",)`
 
-This is the first rule evaluated.
+### Rule 2: required documents by claim type
 
-### Rule 2: document requirement by claim type
+The service checks required documents using the following map:
 
-After the waiting-period gate, the service checks required documents using this mapping:
+- `life`: `death_certificate`, `identity_document`
+- `disability`: `medical_report`, `identity_document`
 
-- `life` requires: `death_certificate` and `identity_document`
-- `disability` requires: `medical_report` and `identity_document`
+If any required document is missing, the service returns:
 
-Any missing documents result in:
-
-- status: `pending_documents`
-- approved amount: `Decimal("0")`
-- reasons: one entry per missing document in the form `Missing <document>`, sorted by document identifier
+- `status`: `pending_documents`
+- `approved_amount`: `Decimal("0")`
+- `reasons`: one tuple entry per missing document, formatted as `Missing <document>`, sorted by document identifier
 
 ### Rule 3: approved outcome
 
-If the claim is not in the waiting period and all required documents are present, the service returns:
+If the claim passes the waiting period rule and all required documents are present, the service returns:
 
-- status: `approved`
-- approved amount: the original claim amount
-- reasons: an empty tuple `()`
+- `status`: `approved`
+- `approved_amount`: the original recognized claim amount
+- `reasons`: `()`
 
-## Behaviors not implemented by this code
+### Scope boundaries
 
-The service does not currently validate or enforce the following behaviors:
+The current code does not implement additional validation rules such as:
 
-- unsupported claim types are not rejected by rule
-- negative or zero amounts are not rejected by rule
-- policy numbers are not validated
-- document names beyond exact identifier comparison are not validated beyond the required set
-- JSON structure beyond the expected dictionary keys is not validated by the library itself
+- rejecting unsupported claim types
+- rejecting non-positive or zero amounts
+- validating policy numbers beyond storing the raw value
+- validating JSON shape beyond the keys accessed when loading a record
 
-This guide is intentionally limited to behaviors that are actually present in the code.
+Those behaviors are not part of the implemented logic in the current codebase.
 
-## Example decision flow
+## Data and privacy
 
-### Example: referred claim
-
-```python
-from decimal import Decimal
-from dreamguard import Claim, assess_claim
-
-claim = Claim(
-    policy_number="POL-2001",
-    claim_type="life",
-    amount=Decimal("5000.00"),
-    months_active=2,
-    documents=("death_certificate", "identity_document"),
-)
-
-print(assess_claim(claim))
-# ClaimDecision(status='referred', approved_amount=Decimal('0'), reasons=('Waiting period review required',))
-```
-
-### Example: pending documents
-
-```python
-from decimal import Decimal
-from dreamguard import Claim, assess_claim
-
-claim = Claim(
-    policy_number="POL-2002",
-    claim_type="life",
-    amount=Decimal("5000.00"),
-    months_active=12,
-    documents=("identity_document",),
-)
-
-print(assess_claim(claim))
-# ClaimDecision(status='pending_documents', approved_amount=Decimal('0'), reasons=('Missing death_certificate',))
-```
-
-### Example: approved claim
-
-```python
-from decimal import Decimal
-from dreamguard import Claim, assess_claim
-
-claim = Claim(
-    policy_number="POL-2003",
-    claim_type="life",
-    amount=Decimal("5000.00"),
-    months_active=12,
-    documents=("death_certificate", "identity_document"),
-)
-
-print(assess_claim(claim))
-# ClaimDecision(status='approved', approved_amount=Decimal('5000.00'), reasons=())
-```
+All records in this repository are synthetic. Only fictional policy numbers,
+claim details, documents, and monetary values should be used in examples,
+tests, and exercises. Do not add real customer, identity, health, policy,
+contact, or financial information to this project.
 
 ## Summary
 
-The DreamGuard service is a simple synthetic claims assessment example. It reads claim records, converts them to typed objects, applies a short rule set, and returns an immutable decision record without external processing. All data in the repository is synthetic, and the service behavior described here matches the code as it exists today.
+DreamGuard Claims is a small training service that loads synthetic claims, evaluates a narrow decision flow, and returns an immutable `ClaimDecision` object. New developers can run the unit tests, run the scorecard, and start the local service with the commands in this guide. The code intentionally models a simplified claims-approval workflow, and the behavior described here matches the current implementation.
