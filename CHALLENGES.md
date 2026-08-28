@@ -234,3 +234,37 @@ referred, and rejected outcomes in the browser.
 - The workbench calls the Python service instead of duplicating decision rules.
 - All four decision states are visible through synthetic scenarios.
 - The layout works on desktop and mobile.
+
+## Optional Bonus: Connect GitLab with MCP
+
+After completing the race, connect GitHub Copilot in VS Code to GitLab's hosted
+MCP server. This optional exercise is not scored. GitLab currently marks the MCP
+server as Beta.
+
+### Prerequisites
+
+Your GitLab administrator must enable GitLab Duo availability, beta and
+experimental features, and MCP server access for your group or instance.
+
+### Steps
+
+1. Open the VS Code Command Palette with `Ctrl+Shift+P`.
+2. Run `MCP: Add Server` and select `HTTP`.
+3. Enter `https://gitlab.com/api/v4/mcp`. For GitLab Self-Managed or Dedicated,
+   replace `gitlab.com` with your GitLab instance host.
+4. Enter `GitLab` as the server ID.
+5. Save the configuration globally or in the workspace.
+6. Review and approve the OAuth authorization request in your browser. Do not
+   create, paste, or commit an access token.
+7. Run `MCP: List Servers` and confirm that GitLab is connected.
+8. Open a new Copilot chat and try this read-only verification prompt:
+
+```text
+Using GitLab MCP, list my accessible projects. Do not create or modify anything.
+```
+
+Review every requested tool action before approval. MCP tools can encounter
+untrusted instructions in issues, merge requests, and repository content, so use
+them only with GitLab projects and content you trust. See the
+[official GitLab MCP server documentation](https://docs.gitlab.com/user/model_context_protocol/mcp_server/)
+for current availability and configuration details.

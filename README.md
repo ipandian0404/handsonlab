@@ -71,6 +71,17 @@ synthetic claim inputs to the Python assessment API, so changes to
 `assess_claim` are visible in the browser. No npm installation or frontend
 compilation is required. Stop the server with `Ctrl+C`.
 
+## Optional: connect GitLab with MCP
+
+After finishing the challenge, the completion screen includes an optional setup
+for connecting GitHub Copilot in VS Code to GitLab's hosted MCP server. It uses
+HTTP transport and browser-based OAuth; do not paste tokens into chat or commit
+credentials. GitLab currently marks this feature as Beta and an administrator
+must enable the required GitLab Duo, beta-feature, and MCP access settings.
+
+See [the optional bonus instructions](CHALLENGES.md#optional-bonus-connect-gitlab-with-mcp)
+and the [official GitLab MCP server documentation](https://docs.gitlab.com/user/model_context_protocol/mcp_server/).
+
 ## Deploy to Azure App Service
 
 The repository includes an `azd` configuration and Bicep infrastructure for a

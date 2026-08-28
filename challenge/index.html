@@ -178,6 +178,8 @@
     .modal-backdrop[hidden] { display: none; }
     .finish-modal {
       width: min(625px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
       padding: clamp(28px, 7vw, 58px);
       text-align: center;
       background: var(--cp-bg-elevated);
@@ -190,6 +192,18 @@
     .finish-modal p { color: var(--cp-text-soft); font-size: 1.1rem; }
     .finish-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 28px 0 42px; }
     .finish-item { padding: 12px; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 8px; }
+    .bonus {
+      margin: 0 0 28px;
+      text-align: left;
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+    }
+    .bonus summary { padding: 14px 16px; color: var(--cp-accent); cursor: pointer; font-weight: 800; }
+    .bonus-content { padding: 0 18px 18px; border-top: 1px solid var(--cp-border); }
+    .bonus-content p, .bonus-content li { color: var(--cp-text-soft); font-size: 0.9rem; }
+    .bonus-content code { overflow-wrap: anywhere; }
+    .bonus-content a { color: var(--cp-link); }
     @media (max-width: 640px) {
       .brand { align-items: flex-start; flex-direction: column; }
       .track { grid-template-columns: repeat(7, minmax(42px, 1fr)); overflow-x: auto; }
@@ -228,6 +242,23 @@
         <div class="finish-item">🧪 Testing</div>
         <div class="finish-item">🖥️ Build &amp; Demo</div>
       </div>
+      <details class="bonus">
+        <summary>Optional bonus: Connect GitLab with MCP</summary>
+        <div class="bonus-content">
+          <p>Use GitLab's hosted MCP server to let GitHub Copilot access GitLab projects, issues, and merge requests through browser-based OAuth. The feature is currently Beta.</p>
+          <ol>
+            <li>Confirm your GitLab administrator has enabled GitLab Duo, beta features, and MCP server access.</li>
+            <li>In VS Code, open the Command Palette with <code>Ctrl+Shift+P</code>.</li>
+            <li>Run <code>MCP: Add Server</code> and select <code>HTTP</code>.</li>
+            <li>Enter <code>https://gitlab.com/api/v4/mcp</code>. For self-managed GitLab, replace <code>gitlab.com</code> with your instance host.</li>
+            <li>Use server ID <code>GitLab</code>, save it globally or to the workspace, then approve the OAuth request in your browser.</li>
+            <li>Run <code>MCP: List Servers</code> and confirm GitLab is connected.</li>
+            <li>In a new Copilot chat, ask: <code>Using GitLab MCP, list my accessible projects. Do not create or modify anything.</code></li>
+          </ol>
+          <p><strong>Security:</strong> Never paste a token into chat or commit credentials. Review every requested tool action and use MCP only with GitLab projects and content you trust.</p>
+          <p><a href="https://docs.gitlab.com/user/model_context_protocol/mcp_server/" target="_blank" rel="noopener">Open the official GitLab MCP documentation</a></p>
+        </div>
+      </details>
       <button class="nav-button primary" id="raceAgain" type="button">🔄 Race Again</button>
     </section>
   </div>
