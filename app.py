@@ -11,7 +11,20 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from dreamguard import Claim, assess_claim
+from dreamguard import Claim, ClientContact, assess_claim, build_notification_message
+
+
+def serialize_for_json(value: Any) -> Any:
+    """Convert Decimal values into JSON-safe strings recursively."""
+    if isinstance(value, Decimal):
+        return str(value)
+    if isinstance(value, dict):
+        return {str(key): serialize_for_json(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [serialize_for_json(item) for item in value]
+    if isinstance(value, tuple):
+        return [serialize_for_json(item) for item in value]
+    return value
 
 
 def assess_payload(payload: dict[str, Any]) -> dict[str, Any]:
@@ -28,10 +41,16 @@ def assess_payload(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Invalid claim payload") from error
 
     decision = assess_claim(claim)
+    contact = ClientContact(
+        name="Taylor Rivera",
+        email="taylor.rivera@example.invalid",
+        phone="+1-555-0101",
+    )
     return {
         "status": decision.status,
         "approved_amount": str(decision.approved_amount),
         "reasons": list(decision.reasons),
+        "notification": build_notification_message(claim, decision, contact),
     }
 
 
@@ -74,7 +93,7 @@ class ChallengeHandler(SimpleHTTPRequestHandler):
         self._send_json(200, response)
 
     def _send_json(self, status: int, payload: dict[str, Any]) -> None:
-        body = json.dumps(payload).encode("utf-8")
+        body = json.dumps(serialize_for_json(payload)).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
