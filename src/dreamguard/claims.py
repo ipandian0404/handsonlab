@@ -26,20 +26,6 @@ def assess_claim(claim: Claim) -> ClaimDecision:
         "disability": {"medical_report", "identity_document"},
     }
 
-    if claim.claim_type not in required_documents:
-        return ClaimDecision(
-            "rejected",
-            Decimal("0"),
-            (f"Unsupported claim type: {claim.claim_type}",),
-        )
-
-    if claim.amount <= 0:
-        return ClaimDecision(
-            "rejected",
-            Decimal("0"),
-            ("Claim amount must be greater than zero",),
-        )
-
     if claim.months_active < 3:
         return ClaimDecision("referred", Decimal("0"), ("Waiting period review required",))
 
