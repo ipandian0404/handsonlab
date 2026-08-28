@@ -8,8 +8,15 @@ from decimal import Decimal
 class Claim:
     """Represent an immutable synthetic claim submitted for assessment.
 
-    Monetary values use :class:`~decimal.Decimal`, and ``documents`` contains
-    the document identifiers supplied with the claim.
+    All claims use entirely fictional data. Monetary values use
+    :class:`~decimal.Decimal` to avoid floating-point precision issues.
+
+    Attributes:
+        policy_number: Fictional policy identifier.
+        claim_type: Claim category; only ``life`` and ``disability`` are assessed.
+        amount: Requested claim amount as a :class:`~decimal.Decimal`.
+        months_active: Duration the policy has been active; must be 3+ to assess.
+        documents: Tuple of fictional document identifiers required by the claim type.
     """
 
     policy_number: str
@@ -23,8 +30,14 @@ class Claim:
 class ClaimDecision:
     """Represent the immutable result of assessing a synthetic claim.
 
-    ``status`` identifies the outcome, ``approved_amount`` is zero unless the
-    claim is approved, and ``reasons`` explains non-approved outcomes.
+    All assessment results are deterministic and based on fictional claim data.
+
+    Attributes:
+        status: Outcome of assessment. Valid values are ``rejected``,
+            ``referred``, ``pending_documents``, or ``approved``.
+        approved_amount: Claim amount approved, or zero if not approved.
+        reasons: Tuple of explanatory messages for non-approved outcomes.
+            Empty when status is ``approved``.
     """
 
     status: str
@@ -35,18 +48,28 @@ class ClaimDecision:
 def assess_claim(claim: Claim) -> ClaimDecision:
     """Assess a synthetic claim using the current DreamGuard rules.
 
-    Unsupported claim types and non-positive amounts are rejected. Valid claims
-    active for fewer than three months are referred. Otherwise, life and
-    disability claims with missing required documents remain pending. Every
-    claim that reaches the final rule is approved for its requested amount.
+    Assessment applies the following rules in order:
+
+    1. Unsupported claim types (not ``life`` or ``disability``) are rejected.
+    2. Claims with amounts <= zero are rejected.
+    3. Claims with ``months_active`` < 3 are referred for waiting period review.
+    4. Life claims require ``death_certificate`` and ``identity_document``.
+       Disability claims require ``medical_report`` and ``identity_document``.
+    5. Missing required documents result in ``pending_documents`` status.
+    6. All other claims are approved for the requested amount.
+
+    All input claims are entirely fictional, and decisions are deterministic.
 
     Args:
         claim: The synthetic claim to assess.
 
     Returns:
-        A decision containing the status, approved amount, and reasons.
+        A decision containing status (``rejected``, ``referred``,
+        ``pending_documents``, or ``approved``), approved amount, and reasons.
     """
 
+    # Document requirements are claim-type-specific: identity document is
+    # universal; death certificate required for life claims, medical report for disability.
     required_documents = {
         "life": {"death_certificate", "identity_document"},
         "disability": {"medical_report", "identity_document"},
@@ -66,9 +89,11 @@ def assess_claim(claim: Claim) -> ClaimDecision:
             ("Claim amount must be greater than zero",),
         )
 
+    # Waiting period: claims must have been active for 3 months to proceed further.
     if claim.months_active < 3:
         return ClaimDecision("referred", Decimal("0"), ("Waiting period review required",))
 
+    # Find missing documents by set difference; sort for deterministic output.
     missing = required_documents.get(claim.claim_type, set()) - set(claim.documents)
     if missing:
         return ClaimDecision(

@@ -2,10 +2,15 @@
 
 ## Purpose
 
-DreamGuard Claims is a small training service that converts claim records into
-deterministic assessment decisions. Engineers can use its output to exercise
-documentation, testing, and GitHub Copilot workflows. It is not a production
-claims processor and does not communicate with customers or external systems.
+DreamGuard Claims is a small training service that converts synthetic claim
+records into deterministic assessment decisions. Engineers can use its output
+to exercise documentation, testing, and GitHub Copilot workflows. It is not a
+production claims processor and does not communicate with customers or external
+systems.
+
+**All records in this service are entirely fictional.** Every policy number,
+claim detail, document identifier, monetary value, and identity information is
+synthetic and created only for training purposes.
 
 ## Architecture
 
@@ -19,6 +24,28 @@ claims processor and does not communicate with customers or external systems.
   a tuple, and returns a list of `Claim` objects.
 - `dreamguard.__init__` exposes `Claim`, `ClaimDecision`, `assess_claim`, and
   `load_claims` as the package's public API.
+
+## Public API usage
+
+Import and use the public API to assess claims:
+
+```python
+from dreamguard import load_claims, assess_claim
+
+# Load synthetic claims from JSON
+claims = load_claims("data/sample_claims.json")
+
+# Assess each claim deterministically
+for claim in claims:
+    decision = assess_claim(claim)
+    print(f"Claim {claim.policy_number}: {decision.status}")
+    if decision.reasons:
+        for reason in decision.reasons:
+            print(f"  - {reason}")
+```
+
+The `Claim` class represents a synthetic claim submission; `ClaimDecision`
+holds the deterministic assessment result. Both are immutable.
 
 ## Claims decision rules
 
@@ -42,6 +69,31 @@ Rules run in this order:
 
 The current code validates claim type and amount only. It does not validate
 policy numbers, active-policy duration, document names, or JSON shape.
+
+## JSON claims format
+
+The `load_claims` function reads a JSON file containing an array of claim records.
+Each record must have these fields:
+
+- `policy_number` (string): Fictional policy identifier.
+- `claim_type` (string): Claim category (e.g., `life`, `disability`).
+- `amount` (string or number): Requested amount; converted to `Decimal`.
+- `months_active` (integer): Duration the policy has been active.
+- `documents` (array of strings): Fictional document identifiers.
+
+Example:
+
+```json
+[
+  {
+    "policy_number": "POL-001",
+    "claim_type": "life",
+    "amount": "50000.00",
+    "months_active": 36,
+    "documents": ["death_certificate", "identity_document"]
+  }
+]
+```
 
 ## Data and privacy
 
