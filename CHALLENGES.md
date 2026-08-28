@@ -1,6 +1,6 @@
 # Momentum Financial Dreams Copilot Enterprise Challenge Race
 
-Race through four enterprise challenges using GitHub Copilot to improve the
+Race through five enterprise challenges using GitHub Copilot to improve the
 fictional **DreamGuard Claims** service. All records and rules are synthetic.
 This independent lab is not affiliated with Momentum Group.
 
@@ -149,7 +149,7 @@ design, and tasks without changing any files.
 
 ## 4. Testing
 
-**FINISH LINE**
+**FINAL LAP**
 
 Use Copilot to build a test suite that catches claims-rule regressions.
 
@@ -189,3 +189,48 @@ then make only the production changes required for those tests to pass.
 - At least six well-named tests cover happy paths and edge cases.
 - Unsupported types and non-positive amounts cannot be approved.
 - All tests pass and `python scripts/score.py` reports 100/100.
+
+## 5. Build and Demo
+
+**FINISH LINE**
+
+Build the project and use a browser interface to see the claim-rule changes
+working end to end.
+
+### Your Mission
+
+Run the application and verify approved, pending, referred, and rejected
+decisions through the DreamGuard Claims Workbench.
+
+### Enterprise Value
+
+A working vertical slice demonstrates that tested domain logic reaches the user
+experience and gives reviewers a concrete way to validate behavior.
+
+### Steps to Complete
+
+1. Install the project with `python -m pip install -e .`.
+2. Compile with `python -m compileall -q src scripts tests`.
+3. Run the complete test suite and scorecard.
+4. Start the application with `python app.py`.
+5. Open <http://localhost:8000/demo/>.
+6. Exercise the Approved, Pending, Referred, and Rejected presets.
+7. Edit an amount or document selection and confirm the decision changes.
+8. Commit and push the working application.
+
+### Sample Prompt
+
+```text
+Build a dependency-free claims assessment UI backed by the existing Python
+assess_claim function. Add a small JSON API in app.py, keep all records
+synthetic, preserve Decimal values as strings, and verify approved, pending,
+referred, and rejected outcomes in the browser.
+```
+
+### Success Criteria
+
+- The complete test suite passes and the scorecard reports 100/100.
+- The application starts with `python app.py`.
+- The workbench calls the Python service instead of duplicating decision rules.
+- All four decision states are visible through synthetic scenarios.
+- The layout works on desktop and mobile.

@@ -17,6 +17,7 @@ purpose of building and protecting clients' financial dreams.
 | 2 | Custom instructions | 25 |
 | 3 | Spec-driven development agent | 25 |
 | 4 | Testing | 25 |
+| 5 | Build and demo | Completion step |
 
 Start with [the interactive race guide](challenge/index.html), then use
 [the detailed challenge brief](CHALLENGES.md) while working in VS Code.
@@ -37,13 +38,13 @@ No third-party Python packages are required.
 git switch -c <your-initials-and-surname>
 python -m unittest discover -s tests -v
 python scripts/score.py
-python -m http.server 8000
+python app.py
 ```
 
 Open <http://localhost:8000/challenge/> for the race guide. Complete the stages
 in order, rerun the tests and scorecard, and commit after each stage.
 
-## Optional: build and run the project
+## Build and run the project
 
 DreamGuard is a dependency-free Python package with a static HTML frontend.
 Optionally create an isolated environment, install the package, and validate it:
@@ -61,12 +62,14 @@ python scripts/score.py
 Start the frontend in a separate terminal:
 
 ```powershell
-python -m http.server 8000
+python app.py
 ```
 
-Open <http://localhost:8000/challenge/>. The frontend uses static HTML, CSS, and
-JavaScript, so no npm installation or compilation is required. Stop the server
-with `Ctrl+C`.
+Open <http://localhost:8000/challenge/> for the guide and
+<http://localhost:8000/demo/> for the live Claims Workbench. The workbench sends
+synthetic claim inputs to the Python assessment API, so changes to
+`assess_claim` are visible in the browser. No npm installation or frontend
+compilation is required. Stop the server with `Ctrl+C`.
 
 ## Deploy to Azure App Service
 
@@ -89,6 +92,7 @@ allowed `appServicePlanSku` in [infra/main.bicep](infra/main.bicep) when needed.
 
 ```text
 challenge/             Interactive participant guide
+demo/                  Live claims assessment workbench
 data/                  Synthetic claim records
 docs/SERVICE.md        Documentation challenge target
 scripts/score.py       Local scorecard
