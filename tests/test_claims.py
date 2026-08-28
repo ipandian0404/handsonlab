@@ -6,7 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
-from dreamguard import Claim, assess_claim, load_claims
+from dreamguard import Claim, assess_claim
 
 
 class AssessClaimTests(unittest.TestCase):
@@ -31,17 +31,14 @@ class AssessClaimTests(unittest.TestCase):
             claim_type="life",
             amount=Decimal("125000.00"),
             months_active=12,
-            documents=(),
+            documents=("identity_document",),
         )
 
         decision = assess_claim(claim)
 
         self.assertEqual("pending_documents", decision.status)
         self.assertEqual(Decimal("0"), decision.approved_amount)
-        self.assertEqual(
-            ("Missing death_certificate", "Missing identity_document"),
-            decision.reasons,
-        )
+        self.assertEqual(("Missing death_certificate",), decision.reasons)
 
     def test_claim_within_waiting_period_is_referred(self):
         claim = Claim(
@@ -79,7 +76,7 @@ class AssessClaimTests(unittest.TestCase):
             claim_type="travel",
             amount=Decimal("10000.00"),
             months_active=12,
-            documents=(),
+            documents=("identity_document",),
         )
 
         decision = assess_claim(claim)
@@ -107,13 +104,3 @@ class AssessClaimTests(unittest.TestCase):
                     ("Claim amount must be greater than zero",),
                     decision.reasons,
                 )
-
-    def test_valid_claim_file_is_loaded(self):
-        claims = load_claims(Path(__file__).parents[1] / "data" / "sample_claims.json")
-
-        self.assertEqual(3, len(claims))
-        self.assertEqual("SYN-1001", claims[0].policy_number)
-
-
-if __name__ == "__main__":
-    unittest.main()

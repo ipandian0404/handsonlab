@@ -73,7 +73,21 @@ def assess_claim(claim: Claim) -> ClaimDecision:
     if claim.months_active < 3:
         return ClaimDecision("referred", Decimal("0"), ("Waiting period review required",))
 
-    missing = required_documents.get(claim.claim_type, set()) - set(claim.documents)
+    if claim.claim_type not in required_documents:
+        return ClaimDecision(
+            "rejected",
+            Decimal("0"),
+            (f"Unsupported claim type: {claim.claim_type}",),
+        )
+
+    if claim.amount <= 0:
+        return ClaimDecision(
+            "rejected",
+            Decimal("0"),
+            ("Claim amount must be greater than zero",),
+        )
+
+    missing = required_documents[claim.claim_type] - set(claim.documents)
     if missing:
         return ClaimDecision(
             "pending_documents",
