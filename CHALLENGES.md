@@ -1,6 +1,6 @@
 # Momentum Financial Dreams Copilot Enterprise Challenge Race
 
-Race through five enterprise challenges using GitHub Copilot to improve the
+Race through six enterprise challenges using GitHub Copilot to improve the
 fictional **DreamGuard Claims** service. All records and rules are synthetic.
 This independent lab is not affiliated with Momentum Group.
 
@@ -192,7 +192,7 @@ then make only the production changes required for those tests to pass.
 
 ## 5. Build and Demo
 
-**FINISH LINE**
+**FINAL LAP**
 
 Build the project and use a browser interface to see the claim-rule changes
 working end to end.
@@ -235,18 +235,29 @@ referred, and rejected outcomes in the browser.
 - All four decision states are visible through synthetic scenarios.
 - The layout works on desktop and mobile.
 
-## Optional Bonus: Connect GitLab with MCP
+## 6. GitLab MCP
 
-After completing the race, connect GitHub Copilot in VS Code to GitLab's hosted
-MCP server. This optional exercise is not scored. GitLab currently marks the MCP
-server as Beta.
+**FINISH LINE**
+
+Connect GitHub Copilot in VS Code to GitLab's hosted MCP server. GitLab currently
+marks the MCP server as Beta.
+
+### Your Mission
+
+Configure GitLab MCP and verify secure, read-only access to the projects available
+to the signed-in user.
+
+### Enterprise Value
+
+MCP gives AI assistants governed access to development context without copying
+project data or credentials into prompts.
 
 ### Prerequisites
 
 Your GitLab administrator must enable GitLab Duo availability, beta and
 experimental features, and MCP server access for your group or instance.
 
-### Steps
+### Steps to Complete
 
 1. Open the VS Code Command Palette with `Ctrl+Shift+P`.
 2. Run `MCP: Add Server` and select `HTTP`.
@@ -268,3 +279,10 @@ untrusted instructions in issues, merge requests, and repository content, so use
 them only with GitLab projects and content you trust. See the
 [official GitLab MCP server documentation](https://docs.gitlab.com/user/model_context_protocol/mcp_server/)
 for current availability and configuration details.
+
+### Success Criteria
+
+- GitLab appears as connected in `MCP: List Servers`.
+- Authentication uses browser OAuth and no token is stored in the repository.
+- The read-only verification prompt returns only accessible projects.
+- Every MCP tool action is reviewed before approval.

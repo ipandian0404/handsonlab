@@ -87,7 +87,7 @@
     .track {
       position: relative;
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(8, 1fr);
       align-items: start;
       max-width: 920px;
       margin: 28px auto 0;
@@ -192,21 +192,9 @@
     .finish-modal p { color: var(--cp-text-soft); font-size: 1.1rem; }
     .finish-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 28px 0 42px; }
     .finish-item { padding: 12px; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 8px; }
-    .bonus {
-      margin: 0 0 28px;
-      text-align: left;
-      background: var(--cp-surface);
-      border: 1px solid var(--cp-border);
-      border-radius: 8px;
-    }
-    .bonus summary { padding: 14px 16px; color: var(--cp-accent); cursor: pointer; font-weight: 800; }
-    .bonus-content { padding: 0 18px 18px; border-top: 1px solid var(--cp-border); }
-    .bonus-content p, .bonus-content li { color: var(--cp-text-soft); font-size: 0.9rem; }
-    .bonus-content code { overflow-wrap: anywhere; }
-    .bonus-content a { color: var(--cp-link); }
     @media (max-width: 640px) {
       .brand { align-items: flex-start; flex-direction: column; }
-      .track { grid-template-columns: repeat(7, minmax(42px, 1fr)); overflow-x: auto; }
+      .track { grid-template-columns: repeat(8, minmax(42px, 1fr)); overflow-x: auto; }
       .stop small { display: none; }
       main { margin-top: 24px; }
       .controls { flex-direction: column; }
@@ -234,31 +222,15 @@
     <section class="finish-modal" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
       <h2 id="finishTitle">🏆 RACE COMPLETE!</h2>
       <div class="celebrate" aria-hidden="true">🎉 &nbsp; 🏎️ &nbsp; 🏁</div>
-      <p>You've mastered all 5 enterprise challenges with GitHub Copilot!</p>
+      <p>You've mastered all 6 enterprise challenges with GitHub Copilot!</p>
       <div class="finish-grid">
         <div class="finish-item">📄 Documentation</div>
         <div class="finish-item">⚙️ Custom Instructions</div>
         <div class="finish-item">🤖 Spec-Driven Development Agent</div>
         <div class="finish-item">🧪 Testing</div>
         <div class="finish-item">🖥️ Build &amp; Demo</div>
+        <div class="finish-item">🔌 GitLab MCP</div>
       </div>
-      <details class="bonus">
-        <summary>Optional bonus: Connect GitLab with MCP</summary>
-        <div class="bonus-content">
-          <p>Use GitLab's hosted MCP server to let GitHub Copilot access GitLab projects, issues, and merge requests through browser-based OAuth. The feature is currently Beta.</p>
-          <ol>
-            <li>Confirm your GitLab administrator has enabled GitLab Duo, beta features, and MCP server access.</li>
-            <li>In VS Code, open the Command Palette with <code>Ctrl+Shift+P</code>.</li>
-            <li>Run <code>MCP: Add Server</code> and select <code>HTTP</code>.</li>
-            <li>Enter <code>https://gitlab.com/api/v4/mcp</code>. For self-managed GitLab, replace <code>gitlab.com</code> with your instance host.</li>
-            <li>Use server ID <code>GitLab</code>, save it globally or to the workspace, then approve the OAuth request in your browser.</li>
-            <li>Run <code>MCP: List Servers</code> and confirm GitLab is connected.</li>
-            <li>In a new Copilot chat, ask: <code>Using GitLab MCP, list my accessible projects. Do not create or modify anything.</code></li>
-          </ol>
-          <p><strong>Security:</strong> Never paste a token into chat or commit credentials. Review every requested tool action and use MCP only with GitLab projects and content you trust.</p>
-          <p><a href="https://docs.gitlab.com/user/model_context_protocol/mcp_server/" target="_blank" rel="noopener">Open the official GitLab MCP documentation</a></p>
-        </div>
-      </details>
       <button class="nav-button primary" id="raceAgain" type="button">🔄 Race Again</button>
     </section>
   </div>
@@ -267,7 +239,7 @@
     const stages = [
       {
         icon: "🛞", label: "Pit Stop", status: "Overview", title: "🏁 Pit Stop — Getting Started",
-        intro: "Race through 5 enterprise challenges using GitHub Copilot to transform a fictional claims service into working software you can see.",
+        intro: "Race through 6 enterprise challenges using GitHub Copilot to transform a fictional claims service into working software you can see.",
         body: `<h2>🎯 What Is This Challenge?</h2><p>Your mission is to improve <strong>DreamGuard Claims</strong> through documentation, custom instructions, a spec-driven agent, and testing.</p><h2>🧰 Pre-requisites</h2><ul><li>Git and Python 3.10+</li><li>Visual Studio Code</li><li>GitHub Copilot and GitHub Copilot Chat</li><li>Edge or Chrome</li></ul><h2>⚙️ Set Up</h2><ol><li>Clone the starter project and enter its folder: <code>git clone https://github.com/ipandian0404/handsonlab.git</code>, then <code>cd handsonlab</code>.</li><li>Open the cloned project in VS Code with <code>code .</code></li><li>Verify GitHub Copilot is signed in, then open Chat with <code>Ctrl+Shift+I</code>.</li><li>In a terminal, create your race branch: <code>git switch -c &lt;your-initials-and-surname&gt;</code>.</li><li>Record the baseline by running <code>python -m unittest discover -s tests -v</code> and <code>python scripts/score.py</code>.</li><li>In a separate terminal, start the guide with <code>python app.py</code>.</li><li>Click <a href="http://localhost:8000/" target="_blank" rel="noopener">http://localhost:8000/</a> to open the local guide.</li></ol><p>The cloned repository is the base project for the challenge. The tests confirm the starter code works before you change it. The local server only displays this challenge guide; keep that terminal open while completing the race.</p><h2>▶️ Optional: Install the Package</h2><p>An editable install is not required for the challenge, but you can use an isolated environment:</p><ol><li>Create and activate a Python virtual environment.</li><li>Install the package with <code>python -m pip install -e .</code></li><li>Compile with <code>python -m compileall -q src scripts tests</code>.</li></ol><h2>✅ Success Criteria</h2><ul><li>The project opens without errors.</li><li>GitHub Copilot Chat responds.</li><li>Two baseline tests pass.</li><li>The scorecard reports 5/100.</li><li>The frontend loads at <a href="http://localhost:8000/" target="_blank" rel="noopener">http://localhost:8000/</a>.</li></ul>`
       },
       {
@@ -291,9 +263,14 @@
         body: `<h2>🎯 Your Mission</h2><p>Generate tests covering happy paths, edge cases, boundaries, and invalid inputs.</p><h2>🏢 Enterprise Value</h2><p class="enterprise">Automated tests enable confident change, reduce incidents, support continuous delivery, and protect customer trust.</p><h2>📝 Steps to Complete</h2><ol><li>Stay on your race branch.</li><li>Test approval, pending-document, and referral decisions.</li><li>Add boundary and invalid-input tests.</li><li>Make only the required production changes.</li><li>Run tests and the scorecard.</li><li>Commit and push.</li></ol><h2>💡 Sample Prompts</h2>${prompt("Write unittest tests for #file:src/dreamguard/claims.py covering approval, missing documents, waiting-period referral, and the three-month boundary.")}${prompt("Add edge-case tests for unsupported claim types and zero or negative amounts, then make only the production changes required for those tests to pass.")}<h2>✅ Success Criteria</h2><ul><li>At least six well-named tests cover happy paths and edges.</li><li>Unsupported types and non-positive amounts cannot be approved.</li><li>All tests pass.</li><li>The scorecard reports 100/100.</li></ul>`
       },
       {
-        icon: "🖥️", label: "Build & Demo", status: "Finish Line", title: "Build and See Your Changes",
+        icon: "🖥️", label: "Build & Demo", status: "Final Lap", title: "Build and See Your Changes",
         intro: "Connect the Python claims rules to a usable interface and verify each decision in the browser.",
         body: `<h2>🎯 Your Mission</h2><p>Build the project, run the application, and use the Claims Workbench to prove that your production changes are visible end to end.</p><h2>🏢 Enterprise Value</h2><p class="enterprise">A working vertical slice shows that tested domain logic reaches the user experience and gives reviewers a concrete way to validate behavior.</p><h2>📝 Steps to Complete</h2><ol><li>Install the project with <code>python -m pip install -e .</code>.</li><li>Compile it with <code>python -m compileall -q src scripts tests</code>.</li><li>Run <code>python -m unittest discover -s tests -v</code> and <code>python scripts/score.py</code>.</li><li>Start the application with <code>python app.py</code>.</li><li>Open <a href="/demo/" target="_blank" rel="noopener">the Claims Workbench</a>.</li><li>Exercise the Approved, Pending, Referred, and Rejected presets.</li><li>Edit an amount or document selection and confirm the decision changes.</li><li>Commit and push the working UI and service changes.</li></ol><h2>💡 Sample Prompt</h2>${prompt("Build a dependency-free claims assessment UI backed by the existing Python assess_claim function. Add a small JSON API in app.py, keep all records synthetic, preserve Decimal values as strings, and verify approved, pending, referred, and rejected outcomes in the browser.")}<h2>✅ Success Criteria</h2><ul><li>The complete test suite passes and the scorecard reports 100/100.</li><li>The application starts with <code>python app.py</code>.</li><li>The workbench calls the Python service instead of duplicating decision rules.</li><li>All four decision states are visible through synthetic scenarios.</li><li>The layout works on desktop and mobile.</li></ul>`
+      },
+      {
+        icon: "🔌", label: "GitLab MCP", status: "Finish Line", title: "GitLab MCP",
+        intro: "Connect GitHub Copilot to GitLab projects, issues, and merge requests through the hosted MCP server.",
+        body: `<h2>🎯 Your Mission</h2><p>Configure GitLab's hosted MCP server in VS Code and verify a secure, read-only interaction from Copilot Chat. GitLab currently marks this feature as Beta.</p><h2>🏢 Enterprise Value</h2><p class="enterprise">MCP gives AI assistants governed access to development context without copying project data or credentials into prompts.</p><h2>🧰 Prerequisites</h2><p>Your GitLab administrator must enable GitLab Duo availability, beta and experimental features, and MCP server access for your group or instance.</p><h2>📝 Steps to Complete</h2><ol><li>Open the VS Code Command Palette with <code>Ctrl+Shift+P</code>.</li><li>Run <code>MCP: Add Server</code> and select <code>HTTP</code>.</li><li>Enter <code>https://gitlab.com/api/v4/mcp</code>. For self-managed GitLab, replace <code>gitlab.com</code> with your instance host.</li><li>Use server ID <code>GitLab</code> and save the configuration globally or in the workspace.</li><li>Review and approve the OAuth request in your browser. Do not create, paste, or commit an access token.</li><li>Run <code>MCP: List Servers</code> and confirm GitLab is connected.</li><li>Use the verification prompt below in a new Copilot chat and review any requested tool action before approval.</li></ol><h2>💡 Verification Prompt</h2>${prompt("Using GitLab MCP, list my accessible projects. Do not create or modify anything.")}<p class="note">Security: MCP tools can encounter untrusted instructions in issues, merge requests, and repository content. Use them only with GitLab projects and content you trust.</p><p><a href="https://docs.gitlab.com/user/model_context_protocol/mcp_server/" target="_blank" rel="noopener">Open the official GitLab MCP documentation</a>.</p><h2>✅ Success Criteria</h2><ul><li>GitLab appears as connected in <code>MCP: List Servers</code>.</li><li>Authentication uses browser OAuth and no token is stored in the repository.</li><li>The read-only verification prompt returns only projects the signed-in user can access.</li><li>Every MCP tool action is reviewed before approval.</li></ul>`
       },
       { icon: "🏁", label: "Finish", status: "Complete", title: "Finish Line", intro: "Review your work and complete the race.", body: "" }
     ];
