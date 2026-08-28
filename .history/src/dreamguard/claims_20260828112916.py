@@ -60,18 +60,14 @@ def assess_claim(claim: Claim) -> ClaimDecision:
 
     This function evaluates a claim against the following rules in order:
 
-    1. **Claim type validation**: Only "life" and "disability" types are supported.
-       Unsupported types return status "rejected".
-    2. **Amount validation**: Claim amount must be greater than zero.
-       Zero or negative amounts return status "rejected".
-    3. **Waiting period check**: If `months_active` < 3, return status "referred"
+    1. **Waiting period check**: If `months_active` < 3, return status "referred"
        with approved amount 0 and reason "Waiting period review required".
-    4. **Required documents check**: For claims beyond the waiting period:
+    2. **Required documents check**: For claims beyond the waiting period:
        - Life claims require: death_certificate, identity_document
        - Disability claims require: medical_report, identity_document
        If any required documents are missing, return status "pending_documents" with
        approved amount 0 and sorted reasons like "Missing <document>".
-    5. **Approval**: If all checks pass, return status "approved" with the requested
+    3. **Approval**: If all checks pass, return status "approved" with the requested
        amount and no reasons.
 
     Args:
@@ -83,6 +79,7 @@ def assess_claim(claim: Claim) -> ClaimDecision:
     Notes:
         - All records in this repository are synthetic.
         - The function does not modify the input claim.
+        - Claim type and amount validation are not currently performed.
         - Document validation is case-sensitive exact matching.
 
     Example:
@@ -102,22 +99,6 @@ def assess_claim(claim: Claim) -> ClaimDecision:
         "life": {"death_certificate", "identity_document"},
         "disability": {"medical_report", "identity_document"},
     }
-
-    # Validate claim type
-    if claim.claim_type not in required_documents:
-        return ClaimDecision(
-            "rejected",
-            Decimal("0"),
-            (f"Unsupported claim type: {claim.claim_type}",),
-        )
-
-    # Validate amount
-    if claim.amount <= Decimal("0"):
-        return ClaimDecision(
-            "rejected",
-            Decimal("0"),
-            ("Claim amount must be greater than zero",),
-        )
 
     if claim.months_active < 3:
         return ClaimDecision("referred", Decimal("0"), ("Waiting period review required",))
