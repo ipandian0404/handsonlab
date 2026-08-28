@@ -65,3 +65,27 @@ def assess_claim(claim: Claim) -> ClaimDecision:
         )
 
     return ClaimDecision("approved", claim.amount, ())
+
+
+def calculate_payout(approved_amount: Decimal, processing_fee_rate: Decimal = Decimal("0.10")) -> Decimal:
+    """Calculate the payout after applying a processing fee.
+
+    Args:
+        approved_amount: The approved claim amount as a Decimal (must be >= 0).
+        processing_fee_rate: Fee rate to deduct (default 10%).
+
+    Returns:
+        A Decimal representing the net payout rounded to cents.
+
+    Raises:
+        ValueError: If `approved_amount` is negative or `processing_fee_rate` is out of range.
+    """
+    if approved_amount < 0:
+        raise ValueError("approved_amount must be non-negative")
+    if processing_fee_rate < 0 or processing_fee_rate > 1:
+        raise ValueError("processing_fee_rate must be between 0 and 1")
+
+    # Calculate fee and net payout using Decimal arithmetic, round to cents
+    fee = (approved_amount * processing_fee_rate).quantize(Decimal("0.01"))
+    payout = (approved_amount - fee).quantize(Decimal("0.01"))
+    return payout
